@@ -43,6 +43,10 @@ pinR = config.getint('output', 'red')
 pinG = config.getint('output', 'green')
 pinB = config.getint('output', 'blue')
 
+wiringpi.pinMode(pinR, wiringpi.OUTPUT)
+wiringpi.pinMode(pinG, wiringpi.OUTPUT)
+wiringpi.pinMode(pinB, wiringpi.OUTPUT)
+
 wiringpi.softPwmCreate(pinR, 0, 127)
 wiringpi.softPwmCreate(pinG, 0, 127)
 wiringpi.softPwmCreate(pinB, 0, 127)
