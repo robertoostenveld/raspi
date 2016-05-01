@@ -1,3 +1,9 @@
+test_*.js
+secret.sh
+*.log
+node_modules/*
+node/node_modules/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
