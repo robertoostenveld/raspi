@@ -18,6 +18,8 @@
   "homepage": "https://github.com/robertoostenveld/rubus#readme",
   "dependencies": {
     "express": "^4.13.4",
-    "mqtt": "^1.11.0"
+    "mqtt": "^1.11.0",
+    "parson": "0.0.4",
+    "ttn": "^1.2.0"
   }
 }
