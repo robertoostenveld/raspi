@@ -1,11 +1,15 @@
 var express = require('express');
+var pug = require('pug');
 var bodyParser = require('body-parser');
 var mongodb = require("mongodb");
 var ttn = require('ttn');
 
 var app = express();
+app.set('view engine', 'pug');
 app.use(bodyParser.json());
+app.use(express.static('public'));
 
+var TTN1_SECRET = process.env.TTN1_SECRET;
 var TTN1_APPEUI = process.env.TTN1_APPEUI;
 var TTN1_ACCESSKEY = process.env.TTN1_ACCESSKEY;
 var ttnclient = new ttn.Client('staging.thethingsnetwork.org', TTN1_APPEUI, TTN1_ACCESSKEY);
@@ -70,9 +74,19 @@ app.get("/", function(req, res) {
   });
   db.collection(TTN1_MONGODB_COLLECTION).find({}).toArray(function(err, docs) {
     if (err) {
-      handleError(res, err.message, "Failed to get tests.");
+      handleError(res, err.message, "Failed to get records.");
     } else {
       res.status(200).json(docs);
+    }
+  });
+});
+
+app.get("/last", function(req, res) {
+  db.collection(TTN1_MONGODB_COLLECTION).find({}).sort({"metadata.gateway_time":-1}).limit(1).toArray(function(err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to get records.");
+    } else {
+      res.render('last', docs[0]);
     }
   });
 });
