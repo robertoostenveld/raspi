@@ -63,6 +63,10 @@ function handleError(res, reason, message, code) {
 }
 
 app.get("/", function(req, res) {
+  res.send('endpoints are /all and /last');
+});
+
+app.get("/all", function(req, res) {
   db.collection(TTN1_MONGODB_COLLECTION).distinct('devEUI', {}, function (err, docs) {
     console.log('docs = ' + docs);
     docs.forEach( function(node) {
