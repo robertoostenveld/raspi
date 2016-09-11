@@ -9,15 +9,15 @@ app.set('view engine', 'pug');
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-var TTN1_SECRET = process.env.TTN1_SECRET;
-var TTN1_APPEUI = process.env.TTN1_APPEUI;
-var TTN1_ACCESSKEY = process.env.TTN1_ACCESSKEY;
-var ttnclient = new ttn.Client('staging.thethingsnetwork.org', TTN1_APPEUI, TTN1_ACCESSKEY);
+var TTN2_SECRET = process.env.TTN2_SECRET;
+var TTN2_APPEUI = process.env.TTN2_APPEUI;
+var TTN2_ACCESSKEY = process.env.TTN2_ACCESSKEY;
+var ttnclient = new ttn.Client('staging.thethingsnetwork.org', TTN2_APPEUI, TTN2_ACCESSKEY);
 
 ttnclient.on('uplink', function (msg) {
   console.log('Received message.');
   console.log(msg);
-  db.collection(TTN1_MONGODB_COLLECTION).insertOne(msg, function(err, doc) {
+  db.collection(TTN2_MONGODB_COLLECTION).insertOne(msg, function(err, doc) {
     if (err) {
       console.log("Failed to insert record.");
       console.log(err);
@@ -33,15 +33,15 @@ ttnclient.on('activation', function (msg) {
 
 var ObjectID = mongodb.ObjectID;
 var db; // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
-var TTN1_MONGODB_COLLECTION = process.env.TTN1_MONGODB_COLLECTION;
+var TTN2_MONGODB_COLLECTION = process.env.TTN2_MONGODB_COLLECTION;
 
-if (typeof TTN1_SECRET == 'undefined') {
+if (typeof TTN2_SECRET == 'undefined') {
   console.log('Required environment variable is not set, aborting.');
   process.exit(1);
 }
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.TTN1_MONGODB_URI, function (err, database) {
+mongodb.MongoClient.connect(process.env.TTN2_MONGODB_URI, function (err, database) {
   if (err) {
     console.log(err);
     process.exit(1);
@@ -50,7 +50,7 @@ mongodb.MongoClient.connect(process.env.TTN1_MONGODB_URI, function (err, databas
   db = database;
   console.log("Database connection ready");
   // Initialize the app.
-  var server = app.listen(process.env.TTN1_PORT || 3003, function () {
+  var server = app.listen(process.env.TTN2_PORT || 3004, function () {
     var port = server.address().port;
     console.log("App now running on port", port);
   });
@@ -67,16 +67,16 @@ app.get("/", function(req, res) {
 });
 
 app.get("/all", function(req, res) {
-  db.collection(TTN1_MONGODB_COLLECTION).distinct('devEUI', {}, function (err, docs) {
+  db.collection(TTN2_MONGODB_COLLECTION).distinct('devEUI', {}, function (err, docs) {
     console.log('docs = ' + docs);
     docs.forEach( function(node) {
       console.log('node = ' + node);
-      db.collection(TTN1_MONGODB_COLLECTION).find({'devEUI': node}).sort({'metadata.server_time':1}).limit(1).toArray( function (date) {
+      db.collection(TTN2_MONGODB_COLLECTION).find({'devEUI': node}).sort({'metadata.server_time':1}).limit(1).toArray( function (date) {
         console.log('date = ' + date);
       });
     });
   });
-  db.collection(TTN1_MONGODB_COLLECTION).find({}).toArray(function(err, docs) {
+  db.collection(TTN2_MONGODB_COLLECTION).find({}).toArray(function(err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get records.");
     } else {
@@ -86,7 +86,7 @@ app.get("/all", function(req, res) {
 });
 
 app.get("/last", function(req, res) {
-  db.collection(TTN1_MONGODB_COLLECTION).find({}).sort({"metadata.server_time":-1}).limit(1).toArray(function(err, docs) {
+  db.collection(TTN2_MONGODB_COLLECTION).find({}).sort({"metadata.server_time":-1}).limit(1).toArray(function(err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get records.");
     } else {
