@@ -1,0 +1,12 @@
+var ttn = require('ttn');
+var appEUI = '70B3D57ED00004B3';
+var accessKey = 's+QSUvklNCa3JOcIrsCrtWpmuk3uuKMef05KOmDLOP0=';
+var client = new ttn.Client('staging.thethingsnetwork.org', appEUI, accessKey);
+
+client.on('uplink', function (msg) {
+  console.log('Received message', msg);
+});
+
+client.on('activation', function (msg) {
+  console.log('Device activated:', msg.devEUI);
+});
