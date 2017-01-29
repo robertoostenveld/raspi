@@ -1,31 +1,49 @@
 var net = require('net');
+var express = require('express');
+var app = express();
 
-var client = new net.Socket();
+var PILIGHT_HOST = '192.168.1.7';
+var PILIGHT_PORT = 5000;
 
-var HOST = '192.168.1.2';
-var PORT = 5000;
+var PORT = 3000;
 
-client.connect(PORT, HOST, function() {
-    console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-
-    // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
-    var message = '{ "action": "identify", "options": { "core": 1, "receiver": 1, "config": 1, "forward": 0 }, "uuid": "0000-d0-63-00-000000", "media": "all"}';
-    client.write(message);
-
+app.listen(PORT, function () {
+  console.log('Listening on port ' + PORT);
 });
 
-// Add a 'data' event handler for the client socket
-// data is what the server sent to this socket
-client.on('data', function(data) {
-    
-    console.log('DATA: ' + data);
-    // Close the client socket completely
-    // client.destroy();
-    
+app.get([], function (req, res) {
+  arr = req.url.split('/');
+  if ( arr.length > 2 ) {
+    var allowed_device = ['cv_ketel', 'printer', 'wifi_arwen', 'ventilator_arwen', 'ventilator_robert', 'kerstboom', 'kerstlichtjes'];
+    var allowed_state = ['on', 'off'];
+    device = arr[1];
+    state  = arr[2];
+    if ( allowed_device.indexOf(device)>-1 && allowed_state.indexOf(state)>-1 ) {
+      var message = '{"action":"control","code":{"device":"' + device + '","state":"' + state + '"}}';
+      send_message(message);
+      res.send('OK');
+    }
+    else {
+      res.send('FAILED');
+    }
+  }
+  else {
+    res.send('FAILED');
+  }
 });
 
-// Add a 'close' event handler for the client socket
-client.on('close', function() {
-    console.log('Connection closed');
-});
+function send_message(message) {
+  console.log('MESSAGE: ' + message);
+  var client = new net.Socket();
+  client.connect(PILIGHT_PORT, PILIGHT_HOST, function() {
+  }).on('connect', function() {
+      console.log('CONNECT');
+      client.write(message);
+  }).on('data', function(data) {
+      console.log('DATA: ' + data);
+      client.destroy();
+  }).on('close', function() {
+      console.log('CLOSE');
+  });
+};
 
