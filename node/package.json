@@ -1,5 +1,5 @@
 {
-  "name": "rubus",
+  "name": "raspi",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,18 +8,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/robertoostenveld/rubus.git"
+    "url": "git+https://github.com/robertoostenveld/raspi.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/robertoostenveld/rubus/issues"
+    "url": "https://github.com/robertoostenveld/raspi/issues"
   },
-  "homepage": "https://github.com/robertoostenveld/rubus#readme",
+  "homepage": "https://github.com/robertoostenveld/raspi#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "connect": "^3.5.0",
     "express": "^4.14.0",
     "mongodb": "^2.2.1",
+    "morgan": "^1.7.0",
     "mqtt": "^1.11.0",
     "parson": "0.0.4",
     "pug": "^2.0.0-beta3",
