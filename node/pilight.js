@@ -5,7 +5,7 @@ var app = express();
 var PILIGHT_HOST = '192.168.1.7';
 var PILIGHT_PORT = 5000;
 
-var PORT = 3000;
+var PORT = 3006;
 
 app.listen(PORT, function () {
   console.log('Listening on port ' + PORT);
