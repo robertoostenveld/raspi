@@ -14,7 +14,7 @@ app.listen(PORT, function () {
 app.get([], function (req, res) {
   arr = req.url.split('/');
   if ( arr.length > 2 ) {
-    var allowed_device = ['cv_ketel', 'printer', 'wifi_arwen', 'ventilator_arwen', 'ventilator_robert', 'kerstboom', 'kerstlichtjes'];
+    var allowed_device = ['cv_ketel', 'printer', 'wifi_arwen', 'ventilator_arwen', 'ventilator_robert', 'kerstboom', 'ante_zac'];
     var allowed_state = ['on', 'off'];
     device = arr[1];
     state  = arr[2];
