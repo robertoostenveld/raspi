@@ -44,6 +44,8 @@ function send_message(message) {
       client.destroy();
   }).on('close', function() {
       console.log('CLOSE');
+  }).on('error', function() {
+      console.log('ERROR');
   });
 };
 
