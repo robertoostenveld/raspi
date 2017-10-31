@@ -1,4 +1,3 @@
-.foreverignore
 test_*.js
 secret.sh
 *.log
