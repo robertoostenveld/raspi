@@ -6,5 +6,7 @@ html
     h1= dev_id
     h1= counter
     h1= metadata.time
-    h1= metadata.gateways
-    h1= metadata.rssi
+    | <h1>gateway</h1>
+    each gateway in metadata.gateways
+      h1= gateway.gtw_id
+      h1= gateway.rssi
