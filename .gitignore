@@ -1,3 +1,11 @@
+c/status_led_black
+c/status_led_blue
+c/status_led_cyan
+c/status_led_green
+c/status_led_mangenta
+c/status_led_red
+c/status_led_white
+c/status_led_yellow
 test_*.js
 secret.sh
 *.log
