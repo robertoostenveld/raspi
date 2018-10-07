@@ -10,14 +10,29 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 
 var TTN1_SECRET = process.env.TTN1_SECRET;
-var TTN1_APPEUI = process.env.TTN1_APPEUI;
+var TTN1_APPID = process.env.TTN1_APPID;
 var TTN1_ACCESSKEY = process.env.TTN1_ACCESSKEY;
-var ttnclient = new ttn.Client('staging.thethingsnetwork.org', TTN1_APPEUI, TTN1_ACCESSKEY);
+var ttnclient = new ttn.Client('eu.thethings.network', TTN1_APPID, TTN1_ACCESSKEY);
 
-ttnclient.on('uplink', function (msg) {
-  console.log('Received message.');
-  console.log(msg);
-  db.collection(TTN1_MONGODB_COLLECTION).insertOne(msg, function(err, doc) {
+ttnclient.on('connect', function(connack) {
+  console.log('[DEBUG]', 'Connect:', connack);
+});
+
+ttnclient.on('error', function(err) {
+  console.error('[ERROR]', err.message);
+});
+
+ttnclient.on('activation', function(deviceId, data) {
+  console.log('[INFO] ', 'Activation:', deviceId, JSON.stringify(data, null, 2));
+});
+
+ttnclient.on('message', function(deviceId, data) {
+  console.info('[INFO] ', 'Message:', deviceId, JSON.stringify(data, null, 2));
+});
+
+ttnclient.on('message', function(deviceId, data) {
+  console.log('Received message:', data);
+  db.collection(TTN1_MONGODB_COLLECTION).insertOne(data, function(err, doc) {
     if (err) {
       console.log("Failed to insert record.");
       console.log(err);
@@ -25,10 +40,6 @@ ttnclient.on('uplink', function (msg) {
       console.log("Inserted record.");
     }
   });
-});
-
-ttnclient.on('activation', function (msg) {
-  console.log('Device activated:', msg.devEUI);
 });
 
 var ObjectID = mongodb.ObjectID;
@@ -71,7 +82,7 @@ app.get("/all", function(req, res) {
     console.log('docs = ' + docs);
     docs.forEach( function(node) {
       console.log('node = ' + node);
-      db.collection(TTN1_MONGODB_COLLECTION).find({'devEUI': node}).sort({'metadata.server_time':1}).limit(1).toArray( function (date) {
+      db.collection(TTN1_MONGODB_COLLECTION).find({'devEUI': node}).sort({'metadata.time':1}).limit(1).toArray( function (date) {
         console.log('date = ' + date);
       });
     });
@@ -86,7 +97,7 @@ app.get("/all", function(req, res) {
 });
 
 app.get("/last", function(req, res) {
-  db.collection(TTN1_MONGODB_COLLECTION).find({}).sort({"metadata.server_time":-1}).limit(1).toArray(function(err, docs) {
+  db.collection(TTN1_MONGODB_COLLECTION).find({}).sort({"metadata.time":-1}).limit(1).toArray(function(err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get records.");
     } else {
@@ -94,4 +105,3 @@ app.get("/last", function(req, res) {
     }
   });
 });
-

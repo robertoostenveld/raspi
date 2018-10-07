@@ -17,14 +17,15 @@
   },
   "homepage": "https://github.com/robertoostenveld/raspi#readme",
   "dependencies": {
-    "body-parser": "^1.15.2",
+    "body-parser": "^1.17.1",
     "connect": "^3.5.0",
-    "express": "^4.14.0",
-    "mongodb": "^2.2.1",
+    "express": "^4.15.2",
+    "grpc": "^1.15.1",
+    "mongodb": "^2.2.26",
     "morgan": "^1.7.0",
     "mqtt": "^1.11.0",
     "parson": "0.0.4",
-    "pug": "^2.0.0-beta3",
-    "ttn": "^1.2.0"
+    "pug": "^2.0.0-beta.12",
+    "ttn": "^2.3.1"
   }
 }
