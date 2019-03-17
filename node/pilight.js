@@ -2,9 +2,11 @@ var net = require('net');
 var express = require('express');
 var app = express();
 
-var PILIGHT_HOST = '192.168.1.7';
+# host and port running the pilight ssdp server
+var PILIGHT_HOST = '192.168.1.6';
 var PILIGHT_PORT = 5000;
 
+# port running this http server
 var PORT = 3006;
 
 app.listen(PORT, function () {
@@ -12,6 +14,7 @@ app.listen(PORT, function () {
 });
 
 app.get([], function (req, res) {
+  # incoming requests should look like http://hostname:port/device/state
   arr = req.url.split('/');
   if ( arr.length > 2 ) {
     var allowed_device = ['cv_ketel', 'printer', 'wifi_arwen', 'ventilator_arwen', 'ventilator_robert', 'kerstboom', 'ante_zac'];
@@ -19,7 +22,7 @@ app.get([], function (req, res) {
     device = arr[1];
     state  = arr[2];
     if ( allowed_device.indexOf(device)>-1 && allowed_state.indexOf(state)>-1 ) {
-      var message = '{"action":"control","code":{"device":"' + device + '","state":"' + state + '"}}';
+      var message = '{"action": "control", "code": {"device": "' + device + '", "state": "' + state + '"}}';
       send_message(message);
       res.send('OK');
     }
