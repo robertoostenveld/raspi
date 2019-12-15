@@ -17,7 +17,7 @@ app.get([], function (req, res) {
   // incoming requests should look like http://hostname:port/device/state
   arr = req.url.split('/');
   if ( arr.length > 2 ) {
-    var allowed_device = ['cv_ketel', 'printer', 'wifi_arwen', 'ventilator_arwen', 'ventilator_robert', 'kerstboom', 'anta_zac'];
+    var allowed_device = ['schakelaar1', 'schakelaar2', 'schakelaar3', 'schakelaar4', 'schakelaar5', 'schakelaar6', 'schakelaar7', 'schakelaar8', 'schakelaar9'];
     var allowed_state = ['on', 'off'];
     device = arr[1];
     state  = arr[2];
