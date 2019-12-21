@@ -3,7 +3,7 @@ var express = require('express');
 var app = express();
 
 // host and port running the pilight ssdp server
-var PILIGHT_HOST = '192.168.1.6';
+var PILIGHT_HOST = '192.168.1.16';
 var PILIGHT_PORT = 5000;
 
 // port running this http server
