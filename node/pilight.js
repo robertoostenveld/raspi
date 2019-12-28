@@ -1,3 +1,9 @@
+// This implements a NodeJS server which translates an incoming REST call into a
+// request to the pilight server using JSON codes.
+//
+// Pilight version 8.0 introduces a REST API instead of posting arbitrary JSON codes
+// and consequently this server is not needed any more.
+
 var net = require('net');
 var express = require('express');
 var app = express();
