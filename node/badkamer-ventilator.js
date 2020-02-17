@@ -34,11 +34,11 @@ client1.on('connect', function () {
 var DEVICE = 'ventilator'
 var HUMIDITY = null
 var LAMBDA = 0.01
-var LEVEL0 = 0	      // off
-var LEVEL1 = 10	      // slow
-var LEVEL2 = 50	      // fast
-var DURATION1 = 60*1000; // slow
-var DURATION2 = 60*1000; // fast
+var LEVEL2 = 50	        // fast, in percent
+var LEVEL1 = 10	        // slow, in percent
+var LEVEL0 = 0	        // off
+var DURATION2 = 10*60*1000 // fast, in milliseconds
+var DURATION1 = 20*60*1000 // slow, in milliseconds
 
 var PREVIOUS = Date.now()
 var STATE = 0
