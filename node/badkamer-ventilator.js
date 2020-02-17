@@ -34,13 +34,15 @@ client1.on('connect', function () {
 var DEVICE = 'ventilator'
 var HUMIDITY = null
 var LAMBDA = 0.01
-var STATE = 0
 var LEVEL0 = 0	      // off
 var LEVEL1 = 10	      // slow
 var LEVEL2 = 50	      // fast
-var DURATION1 = 50*60*1000; // slow
-var DURATION2 = 10*60*1000; // fast
-var PREVIOUS = Date.now();
+var DURATION1 = 60*1000; // slow
+var DURATION2 = 60*1000; // fast
+
+var PREVIOUS = Date.now()
+var STATE = 0
+var LEVEL = LEVEL0
 
 client1.on('message', function (topic, message) {
   data = JSON.parse(message.toString());
@@ -56,35 +58,42 @@ client1.on('message', function (topic, message) {
   if (STATE < 2 && (data.BME280.Humidity - HUMIDITY) > 10) {
     console.log('switch the fan to high when the humidity increases with 10%')
     STATE = 2;
-    var PREVIOUS = Date.now();
+    LEVEL = LEVEL2;
+    CHANGE = true;
+    PREVIOUS = Date.now();
   }
   else if (STATE == 2 && now>(PREVIOUS+DURATION2)) {
     console.log('switch the fan to low after some time')
     STATE = 1;
-    var PREVIOUS = Date.now();
+    LEVEL = LEVEL1;
+    CHANGE = true;
+    PREVIOUS = Date.now();
   }
   else if (STATE == 1 && now>(PREVIOUS+DURATION1)) {
     console.log('switch the fan off after some time')
     STATE = 0;
-    var PREVIOUS = Date.now();
-  }
-
-  if (STATE == 0) {
     LEVEL = LEVEL0;
+    CHANGE = true;
+    PREVIOUS = Date.now();
   }
-  else if (STATE == 1) {
-    LEVEL = LEVEL1;
-  }
-  else if (STATE == 2) {
-    LEVEL = LEVEL2;
+  else {
+    CHANGE = false;
   }
 
-  //console.log(data);
-  //console.log('HUMIDITY ' + HUMIDITY);
-  //console.log('STATE ' + STATE);
-  //console.log('LEVEL ' + LEVEL);
-
-  client1.publish(DEVICE + '/cmnd/dimmer', String(LEVEL));
+  if (CHANGE) {
+    if (LEVEL>0) {
+      client1.publish(DEVICE + '/cmnd/power', 'ON');
+      client1.publish(DEVICE + '/cmnd/dimmer', String(LEVEL));
+    }
+    else {
+      client1.publish(DEVICE + '/cmnd/power', 'OFF');
+      client1.publish(DEVICE + '/cmnd/dimmer', String(LEVEL));
+    }
+    console.log(data);
+    console.log('HUMIDITY ' + HUMIDITY);
+    console.log('STATE ' + STATE);
+    console.log('LEVEL ' + LEVEL);
+  }
 
   client2.publish(MQTT2_USERNAME + '/feeds/temperature', String(data.BME280.Temperature));
   client2.publish(MQTT2_USERNAME + '/feeds/humidity', String(data.BME280.Humidity));
