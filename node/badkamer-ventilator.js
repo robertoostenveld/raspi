@@ -20,85 +20,97 @@ options2 = {port: MQTT2_PORT, username: MQTT2_USERNAME, password: MQTT2_PASSWORD
 var client1 = mqtt.connect(MQTT1_SERVER, options1);
 var client2 = mqtt.connect(MQTT2_SERVER, options2);
 
+client1.on('connect', function () {
+  // this is the one from which the messages originate
+  console.log('connected to ' + MQTT1_SERVER);
+  client1.subscribe('badkamer/tele/SENSOR');
+  client1.subscribe('ventilator/tele/STATE');
+});
+
 client2.on('connect', function () {
   // this is the one to which the messages get forwarded
   console.log('connected to ' + MQTT2_SERVER);
 });
 
-client1.on('connect', function () {
-  // this is the one from which the messages originate
-  console.log('connected to ' + MQTT1_SERVER);
-  client1.subscribe('badkamer/tele/SENSOR');
-});
-
 var DEVICE = 'ventilator'
 var HUMIDITY = null
 var LAMBDA = 0.01
-var LEVEL2 = 50	        // fast, in percent
-var LEVEL1 = 10	        // slow, in percent
+var LEVEL2 = 70	        // fast, in percent
+var LEVEL1 = 30	        // slow, in percent
 var LEVEL0 = 0	        // off
-var DURATION2 = 10*60*1000 // fast, in milliseconds
-var DURATION1 = 20*60*1000 // slow, in milliseconds
+var DURATION2 = 20*60*1000 // fast, in minutes*seconds*milliseconds
+var DURATION1 = 40*60*1000 // slow, in minutes*seconds*milliseconds
 
 var PREVIOUS = Date.now()
 var STATE = 0
 var LEVEL = LEVEL0
 
 client1.on('message', function (topic, message) {
-  data = JSON.parse(message.toString());
   now = Date.now();
+  data = JSON.parse(message.toString());
+  // console.log(data);
 
-  if (HUMIDITY == null) {
-    HUMIDITY = 1.0 * data.BME280.Humidity;
-  }
-  else {
-    HUMIDITY = LAMBDA * data.BME280.Humidity + (1.0-LAMBDA) * HUMIDITY;
-  }
-
-  if (STATE < 2 && (data.BME280.Humidity - HUMIDITY) > 10) {
-    console.log('switch the fan to high when the humidity increases with 10%')
-    STATE = 2;
-    LEVEL = LEVEL2;
-    CHANGE = true;
-    PREVIOUS = Date.now();
-  }
-  else if (STATE == 2 && now>(PREVIOUS+DURATION2)) {
-    console.log('switch the fan to low after some time')
-    STATE = 1;
-    LEVEL = LEVEL1;
-    CHANGE = true;
-    PREVIOUS = Date.now();
-  }
-  else if (STATE == 1 && now>(PREVIOUS+DURATION1)) {
-    console.log('switch the fan off after some time')
-    STATE = 0;
-    LEVEL = LEVEL0;
-    CHANGE = true;
-    PREVIOUS = Date.now();
-  }
-  else {
-    CHANGE = false;
-  }
-
-  if (CHANGE) {
-    if (LEVEL>0) {
-      client1.publish(DEVICE + '/cmnd/power', 'ON');
-      client1.publish(DEVICE + '/cmnd/dimmer', String(LEVEL));
+  if (topic == 'ventilator/tele/STATE') {
+    if (data.POWER == 'OFF') {
+      client2.publish(MQTT2_USERNAME + '/feeds/ventilator', String(0));
     }
     else {
-      client1.publish(DEVICE + '/cmnd/power', 'OFF');
-      client1.publish(DEVICE + '/cmnd/dimmer', String(LEVEL));
+      client2.publish(MQTT2_USERNAME + '/feeds/ventilator', String(data.Dimmer));
     }
-    console.log(data);
-    console.log('HUMIDITY ' + HUMIDITY);
-    console.log('STATE ' + STATE);
-    console.log('LEVEL ' + LEVEL);
-  }
+  } 
 
-  client2.publish(MQTT2_USERNAME + '/feeds/temperature', String(data.BME280.Temperature));
-  client2.publish(MQTT2_USERNAME + '/feeds/humidity', String(data.BME280.Humidity));
-  client2.publish(MQTT2_USERNAME + '/feeds/pressure', String(data.BME280.Pressure));
-  client2.publish(MQTT2_USERNAME + '/feeds/ventilator', String(LEVEL));
+  if (topic == 'badkamer/tele/SENSOR') {
+    if (HUMIDITY == null) {
+      HUMIDITY = 1.0 * data.BME280.Humidity;
+    }
+    else {
+      HUMIDITY = LAMBDA * data.BME280.Humidity + (1.0-LAMBDA) * HUMIDITY;
+    }
+
+    if (STATE < 2 && (data.BME280.Humidity - HUMIDITY) > 10) {
+      console.log('switch the fan to high when the humidity increases with 10%')
+      STATE = 2;
+      LEVEL = LEVEL2;
+      CHANGE = true;
+      PREVIOUS = Date.now();
+    }
+    else if (STATE == 2 && now>(PREVIOUS+DURATION2)) {
+      console.log('switch the fan to low after some time')
+      STATE = 1;
+      LEVEL = LEVEL1;
+      CHANGE = true;
+      PREVIOUS = Date.now();
+    }
+    else if (STATE == 1 && now>(PREVIOUS+DURATION1)) {
+      console.log('switch the fan off after some time')
+      STATE = 0;
+      LEVEL = LEVEL0;
+      CHANGE = true;
+      PREVIOUS = Date.now();
+    }
+    else {
+      CHANGE = false;
+    }
+
+    if (CHANGE) {
+      if (LEVEL>0) {
+        client1.publish(DEVICE + '/cmnd/power', 'ON');
+        client1.publish(DEVICE + '/cmnd/dimmer', String(LEVEL));
+      }
+      else {
+        client1.publish(DEVICE + '/cmnd/dimmer', String(LEVEL));
+        client1.publish(DEVICE + '/cmnd/power', 'OFF');
+      }
+      console.log(data);
+      console.log('HUMIDITY ' + HUMIDITY);
+      console.log('STATE ' + STATE);
+      console.log('LEVEL ' + LEVEL);
+    }
+
+    client2.publish(MQTT2_USERNAME + '/feeds/temperature', String(data.BME280.Temperature));
+    client2.publish(MQTT2_USERNAME + '/feeds/humidity', String(data.BME280.Humidity));
+    client2.publish(MQTT2_USERNAME + '/feeds/pressure', String(data.BME280.Pressure));
+  }
 
 });
 
