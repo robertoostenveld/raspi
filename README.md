@@ -1,4 +1,6 @@
-This directory contains some experimental code for the Raspberry Pi. The code mainly has to do with home automation and domotica. More details can be found on http://robertoostenveld.nl/category/raspberry-pi/
+# Raspi - Raspberry Pi home automation
+
+This repository contains some experimental code for home automation and domotica. More details can be found on http://robertoostenveld.nl/category/raspberry-pi/
 
 
 ## 12V trigger for NAD-D3020 amplifier
