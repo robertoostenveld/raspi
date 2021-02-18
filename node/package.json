@@ -17,18 +17,19 @@
   },
   "homepage": "https://github.com/robertoostenveld/raspi#readme",
   "dependencies": {
-    "body-parser": "^1.17.1",
-    "connect": "^3.5.0",
-    "express": "^4.15.2",
-    "grpc": "^1.15.1",
-    "moment": "^2.24.0",
+    "body-parser": "^1.19.0",
+    "connect": "^3.7.0",
+    "express": "^4.17.1",
+    "grpc": "^1.24.4",
+    "luxon": "^1.25.0",
+    "moment": "^2.29.1",
     "mongodb": "^3.6.1",
-    "morgan": "^1.7.0",
+    "morgan": "^1.10.0",
     "mqtt": "^1.11.0",
     "parson": "0.0.4",
-    "ping": "^0.2.2",
-    "pug": "^2.0.0-beta.12",
-    "request": "^2.88.0",
-    "ttn": "^2.3.1"
+    "ping": "^0.2.3",
+    "pug": "^2.0.4",
+    "request": "^2.88.2",
+    "ttn": "^2.3.3"
   }
 }
