@@ -14,8 +14,8 @@ var MQTT2_PORT      = process.env.MQTT2_PORT
 var MQTT2_USERNAME  = process.env.MQTT2_USERNAME  
 var MQTT2_PASSWORD  = process.env.MQTT2_PASSWORD  
 
-options1 = {port: MQTT1_PORT, username: MQTT1_USERNAME, password: MQTT1_PASSWORD};
-options2 = {port: MQTT2_PORT, username: MQTT2_USERNAME, password: MQTT2_PASSWORD};
+options1 = {port: MQTT1_PORT, username: MQTT1_USERNAME, password: MQTT1_PASSWORD, reconnectPeriod: 15000};
+options2 = {port: MQTT2_PORT, username: MQTT2_USERNAME, password: MQTT2_PASSWORD, reconnectPeriod: 15000};
 
 var client1 = mqtt.connect(MQTT1_SERVER, options1);
 var client2 = mqtt.connect(MQTT2_SERVER, options2);
@@ -23,8 +23,20 @@ var client2 = mqtt.connect(MQTT2_SERVER, options2);
 client1.on('connect', function () {
   // this is the one from which the messages originate
   console.log('connected to ' + MQTT1_SERVER);
-  client1.subscribe('badkamer/tele/SENSOR');
-  client1.subscribe('ventilator/tele/STATE');
+  client1.subscribe('tele/badkamer/SENSOR');
+  client1.subscribe('tele/ventilator/STATE');
+});
+
+client1.on('reconnect', function () {
+  // this is the one from which the messages originate
+  console.log('reconnected to ' + MQTT1_SERVER);
+  client1.subscribe('tele/badkamer/SENSOR');
+  client1.subscribe('tele/ventilator/STATE');
+});
+
+client1.on('error', function(err) {
+  console.log('error connecting to ' + MQTT1_SERVER);
+  // client1.end();
 });
 
 client2.on('connect', function () {
@@ -32,7 +44,16 @@ client2.on('connect', function () {
   console.log('connected to ' + MQTT2_SERVER);
 });
 
-var DEVICE = 'ventilator'
+client2.on('reconnect', function () {
+  // this is the one to which the messages get forwarded
+  console.log('reconnected to ' + MQTT2_SERVER);
+});
+
+client2.on('error', function(err) {
+  console.log('error connecting to ' + MQTT2_SERVER);
+  // client2.end();
+});
+
 var HUMIDITY = null
 var LAMBDA = 0.01
 var LEVEL2 = 70	        // fast, in percent
@@ -50,7 +71,7 @@ client1.on('message', function (topic, message) {
   data = JSON.parse(message.toString());
   // console.log(data);
 
-  if (topic == 'ventilator/tele/STATE') {
+  if (topic == 'tele/ventilator/STATE') {
     if (data.POWER == 'OFF') {
       client2.publish(MQTT2_USERNAME + '/feeds/ventilator', String(0));
     }
@@ -59,7 +80,7 @@ client1.on('message', function (topic, message) {
     }
   } 
 
-  if (topic == 'badkamer/tele/SENSOR') {
+  if (topic == 'tele/badkamer/SENSOR') {
     if (HUMIDITY == null) {
       HUMIDITY = 1.0 * data.BME280.Humidity;
     }
@@ -94,12 +115,12 @@ client1.on('message', function (topic, message) {
 
     if (CHANGE) {
       if (LEVEL>0) {
-        client1.publish(DEVICE + '/cmnd/power', 'ON');
-        client1.publish(DEVICE + '/cmnd/dimmer', String(LEVEL));
-      }
-      else {
-        client1.publish(DEVICE + '/cmnd/dimmer', String(LEVEL));
-        client1.publish(DEVICE + '/cmnd/power', 'OFF');
+        client1.publish('cmnd/ventilator/POWER', 'ON');
+        client1.publish('cmnd/ventilator/Dimmer', String(LEVEL));
+      }                        
+      else {                   
+        client1.publish('cmnd/ventilator/Dimmer', String(LEVEL));
+        client1.publish('cmnd/ventilator/POWER', 'OFF');
       }
       console.log(data);
       console.log('HUMIDITY ' + HUMIDITY);
