@@ -12,9 +12,14 @@ This application detects whether my smart TV and/or Mac mini are switched on. If
 See https://robertoostenveld.nl/12-volt-trigger-for-nad-d3020-amplifier/
 
 
-## Switch PWM fan based on humidity sensor
+## Switch PWM fan based on humidity
 
 The `node/badkamer-ventilator.js` script implements a small application that switches and controls the speed of a Ruck ETAMASTER EC tube fan in my bathroom. It uses an ESP8266-based PWM controller, in combination with a BME280 humidity sensor implemented with another ESP8266. Both are using Tasmota firmware.
+
+
+## Switch IR heating based on occupancy and temperature
+
+The `node/zolder-verwarming.js` controls an infrared heating panel on my attic. The panel is connected to an AWP07L smart power plug with the Tasmota firmware. The switching is based on a SONOFF [SNZB-03](https://sonoff.tech/product/smart-home-security/snzb-03) PIR occupancy sensor and a [SNZB-02](https://sonoff.tech/product/smart-home-security/snzb-02) temperature & humidity sensor. The target temperature is controlled with an IKEA [Tradfri ON/OFF switch](https://www.ikea.com/us/en/p/tradfri-wireless-dimmer-white-10408598/). 
 
 
 ## macOS
