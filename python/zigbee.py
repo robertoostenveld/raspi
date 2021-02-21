@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # This Python script subscribes to MQTT messages from zigbee-bridge
 # and sends a PushNotifier message
 
