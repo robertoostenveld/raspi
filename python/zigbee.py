@@ -17,7 +17,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("tele/zigbee/SENSOR/#")
 
 # these are the devices linked to my Tasmota zigbee-bridge
-Voordeur='0x5E30'
+Voordeur='0x378C'
 Zolder='0x4F42'
 AquaraButton='0x5639'
 TradfriButton='0x690F'
@@ -35,12 +35,12 @@ def on_message(client, userdata, msg):
     except:
         pass
     try:
-        if msg['ZbReceived'][Voordeur]['Occupancy']:
+        if msg['ZbReceived'][Voordeur]['ZoneStatusChange']:
             pn.send_text("Er is iemand bij de voordeur", devices=pd, silent=False)
     except:
         pass
     try:
-        if msg['ZbReceived'][Zolder]['Occupancy']:
+        if msg['ZbReceived'][Zolder]['ZoneStatusChange']:
             pn.send_text("Er is iemand op zolder", devices=pd, silent=False)
     except:
         pass
