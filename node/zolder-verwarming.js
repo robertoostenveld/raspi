@@ -22,8 +22,8 @@ var MQTT2_PORT      = process.env.MQTT2_PORT
 var MQTT2_USERNAME  = process.env.MQTT2_USERNAME  
 var MQTT2_PASSWORD  = process.env.MQTT2_PASSWORD  
 
-options1 = {port: MQTT1_PORT, username: MQTT1_USERNAME, password: MQTT1_PASSWORD};
-options2 = {port: MQTT2_PORT, username: MQTT2_USERNAME, password: MQTT2_PASSWORD};
+options1 = {port: MQTT1_PORT, username: MQTT1_USERNAME, password: MQTT1_PASSWORD, reconnectPeriod: 15000};
+options2 = {port: MQTT2_PORT, username: MQTT2_USERNAME, password: MQTT2_PASSWORD, reconnectPeriod: 15000};
 
 var client1 = mqtt.connect(MQTT1_SERVER, options1);
 var client2 = mqtt.connect(MQTT2_SERVER, options2);
@@ -82,19 +82,15 @@ setInterval(function() {
   if (now<time1 || now>time2) {
     console.log('it is outside of working hours');
     client1.publish('cmnd/tasmota7/POWER', 'OFF');
-    client1.publish('cmnd/tasmota8/POWER', 'OFF');
   } else if (OCCUPANCY<recently) {
     console.log('nobody has been present recently');
     client1.publish('cmnd/tasmota7/POWER', 'OFF');
-    client1.publish('cmnd/tasmota8/POWER', 'OFF');
   } else if (MEASURED>TARGET) {
     console.log('the temperature is above the threshold');
     client1.publish('cmnd/tasmota7/POWER', 'OFF');
-    client1.publish('cmnd/tasmota8/POWER', 'OFF');
   } else {
     console.log('turn on the heater');
     client1.publish('cmnd/tasmota7/POWER', 'ON');
-    client1.publish('cmnd/tasmota8/POWER', 'ON');
   }
 
 }, 5000);
